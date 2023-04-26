@@ -120,35 +120,126 @@ for (let i = 0; i < board.length; i++) {
 
 */
 
+
+/*
 //--------------------------- 해결방안 ------------------------------------------------
-let board = [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 1, 0, 0], [0, 0, 0, 0, 0]]
+let board = [[1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1]]
 
-for (let i = 0; i < board.length; i++) {
-  for (let j = 0; j < board[i].length; j++) {  
-    
+function solution(board) {
+
+  let bomb = []
+  let answer = 0
+
+  // 1인 좌표값을 배열에 넣어준다.
+  for (let i = 0; i < board.length; i++) {
+    for (let j = 0; j < board[i].length; j++) {  
+      if(board[i][j] === 1){
+        bomb.push([i,j])
+      }
+    }
   }
+
+  //받은 좌표의 주변 인덱스를 조회해 1을 할당해준다.
+  for (let i = 0; i < bomb.length; i++) {
+    let x = bomb[i][0]
+    let y = bomb[i][1]
+
+    //0 이라면 1 , 1 1이라면 아무일도 일어나지 않는다.
+    // x 와 y 가 0 보다 작으면 안된다.
+    // x 가 board.length 보다 크면 안된다.
+    // y 가 board[x].length 보다 크면 안된다.
+    if(x - 1 >= 0){
+      if(board[x - 1][y - 1] === 0 && y - 1 >= 0 ) board[x - 1][y - 1] = 1
+      if(board[x - 1][y] === 0 ) board[x - 1][y] = 1
+      if(board[x - 1][y + 1] === 0 && y + 1 < board[x].length) board[x - 1][y + 1] = 1  
+    }
+
+    if(board[x][y - 1] === 0 && y - 1 >= 0  ) board[x][y - 1] = 1
+    if(board[x][y + 1] === 0 && y + 1 < board[x].length ) board[x][y + 1] = 1
+
+    if(x + 1 < board.length){  
+      if(board[x + 1][y - 1] === 0 && y - 1 >= 0) board[x + 1][y - 1] = 1
+      if(board[x + 1][y] === 0 ) board[x + 1][y] = 1
+      if(board[x + 1][y + 1] === 0 && y + 1 < board[x].length) board[x + 1][y + 1] = 1
+    }
+  }
+
+  //요소가 0인 갯수를 찾는다.
+  for (let i = 0; i < board.length; i++) {
+    for (let j = 0; j < board[i].length; j++) {  
+      if(board[i][j] === 0) answer++
+    }
+  }
+
+  return answer;
 }
 
-for (let i = 0; i < board.length; i++) {
-  for (let j = 0; j < board[i].length; j++) {  
-    console.log(board[i][j])
-  }
-}
-
+console.log(solution(board))
 
 // function solution(board) {
 //   var answer = 0;
 //   return answer;
 // }
 
-
+*/
 
 //--------------------------- 우수정답확인 -----------------------------------
 
+function solution(board) {
+  var answer = 0;
+  var answerArray = board.map(x=>board.map(y=>0));
+  for(var y=0; y<board.length; y++) {
+      for(var x=0; x<board.length; x++) {
+          if(board[y][x]===1) {
+              if(y-1 >= 0           && x-1 >= 0)           answerArray[y-1][x-1] = 1;                
+              if(                      x-1 >= 0)           answerArray[y  ][x-1] = 1;
+              if(y+1 < board.length && x-1 >= 0)           answerArray[y+1][x-1] = 1;
+
+              if(y-1 >= 0           )                      answerArray[y-1][  x] = 1;
+                                                           answerArray[y  ][  x] = 1;
+              if(y+1 < board.length)                       answerArray[y+1][  x] = 1;
+
+              if(y-1 >= 0           && x+1 < board.length) answerArray[y-1][x+1] = 1;
+              if(                      x+1 < board.length) answerArray[y  ][x+1] = 1;
+              if(y+1 < board.length && x+1 < board.length) answerArray[y+1][x+1] = 1;
+          }
+      }
+  }
+  answerArray.map(y=> {
+      y.map(x=>{if(x===0) answer++})
+  })
+  return answer;
+}
 
 //--------------------------- 우수정답풀이 -----------------------------------
 
 /*
+새로운 배열을 만들어 할당을 해줌으로써 무한루프를 피했다. 메모리는 더 많이 차지하지만,
+원본데이터를 보존할 수 있는 장점이 있다.
+
+띄어쓰기를 적극 활용해 가독성을 높혔다.
+*/
+
+//--------------------------- 우수정답확인 -----------------------------------
+
+function solution(board) {
+
+  let outside = [[-1,0], [-1,-1], [-1,1], [0,-1],[0,1],[1,0], [1,-1], [1,1]];
+  let safezone = 0;
+
+  board.forEach((row, y, self) => row.forEach((it, x) => {
+      if (it === 1) return false;
+      return outside.some(([oy, ox]) => !!self[oy + y]?.[ox + x])
+             ? false : safezone++;
+  }));
+
+  return safezone;
+}
+
+//--------------------------- 우수정답풀이 -----------------------------------
+
+/*
+새로운 메서드 some()
 
 */
 
@@ -157,6 +248,11 @@ for (let i = 0; i < board.length; i++) {
 /*
 수도코드 3번까지 진행도중
 'JavaScript heap out of memory'라는 이 에러는 Heap 메모리가 부족해서 발생
+중첩 반복문을 많이 돌렸나 해서 가비지컬렉터를 알아보게됐지만, 사실은 무한루프로 인한 힙메모리 부족 발생
+이 기회로 가비지 컬렉터에 대해 제대로 알아 봐야겠다는 생각!
 
+아직 여러 조건에 대한 알고리즘이 많이 약하다.
+3일을 고민해서 풀었긴했지만, 시간이 너무 소비됌.
+알고리즘 게을리 하지 말고, 계속해서 풀면서 공부할것!
 */
 
